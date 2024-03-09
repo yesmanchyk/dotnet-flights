@@ -36,6 +36,8 @@ namespace Flight.Services
 
         public List<Leg> Journey(List<Leg> legs)
         {
+            var isDomestic = legs.All(l => Domestic.Contains(l.Origin) && Domestic.Contains(l.Destination));
+            Console.WriteLine($"{legs.Count} isDomestic={isDomestic}");
             var from = 0;
             var prev = 0;
             var last = 1;
@@ -45,7 +47,7 @@ namespace Flight.Services
             {
                 var span = legs[last].Departure - legs[prev].Arrival;
                 Console.WriteLine($"{last} {legs[last].Destination} {span.TotalMinutes}");
-                if (span.TotalMinutes > 4 * 60) 
+                if (span.TotalMinutes > GetMaxLayoverMinutes(isDomestic)) 
                 {
                     segment = new Leg(legs[from].Origin, legs[prev].Destination, legs[from].Departure, legs[prev].Arrival);
                     segments.Add(segment);
@@ -56,9 +58,10 @@ namespace Flight.Services
             }
             segment = new Leg(legs[from].Origin, legs[prev].Destination, legs[from].Departure, legs[prev].Arrival);
             segments.Add(segment);
-            //if (last == legs.Count) throw new Exception("Segment never ends");
             return segments;
         }
+
+        private double GetMaxLayoverMinutes(bool isDomestic) => isDomestic ? 4 * 60 : 24 * 60;
 
         private DateTimeOffset ParseTime(string time) => DateTimeOffset.Parse(time);
             //DateTimeOffset.ParseExact(time, TimePattern, CultureInfo.InvariantCulture);

@@ -16,7 +16,7 @@ public class FlightServiceTest
     [Fact]
     public void ReadFile_WhenPathIsValid_ReturnsLegs()
     {
-        var path = GetIanJfkFilePath();
+        var path = GetDomesticFlightPath();
 
         var result = _flightService.ReadFile(path);
 
@@ -35,7 +35,7 @@ public class FlightServiceTest
     [Fact]
     public void Journey_WhenDomesticFlight_FourHourLayoverSplitsSegments()
     {
-        var path = Path.Combine("..", "..", "..", "iah-jfk.csv");
+        var path = GetDomesticFlightPath();
         var legs = _flightService.ReadFile(path);
         
         var journey = _flightService.Journey(legs);
@@ -48,5 +48,24 @@ public class FlightServiceTest
     }
 
 
-    private string GetIanJfkFilePath() => Path.Combine("..", "..", "..", "iah-jfk.csv");
+    [Fact]
+    public void Journey_WhenInternationalFlight_TwentyFourHourLayoverSplitsSegments()
+    {
+        var path = GetIternationalFlightPath();
+        var legs = _flightService.ReadFile(path);
+        
+        var journey = _flightService.Journey(legs);
+
+        Assert.Equal(2, journey.Count);
+        Assert.Equal("IAH", journey[0].Origin);
+        Assert.Equal("BOM", journey[0].Destination);
+        Assert.Equal("BOM", journey[1].Origin);
+        Assert.Equal("IAH", journey[1].Destination);
+    }
+
+
+    private string GetDomesticFlightPath() => Path.Combine("..", "..", "..", "domestic.csv");
+
+    private string GetIternationalFlightPath() => Path.Combine("..", "..", "..", "international.csv");
+
 }
