@@ -1,20 +1,11 @@
-﻿using System.Globalization;
-
-namespace Flight.Services
+﻿namespace Flight.Services
 {
     public class FlightService
     {
         public readonly HashSet<string> Domestic =  new(new string[] {"IAH", "ORD", "JFK", "DFW", "DSM"});
         
         public readonly HashSet<string> International = new(new string[] {"BOM", "DBX", "LHR"});
-
-        private const string TimePattern = "M-d-yyyy h:mm";
         
-        public bool IsSegment(int candidate)
-        {
-            return false;
-        }
-
         public List<Leg> ReadFile(string path)
         {
             var lines = File.ReadLines(path);
@@ -37,7 +28,6 @@ namespace Flight.Services
         public List<Leg> Journey(List<Leg> legs)
         {
             var isDomestic = legs.All(l => Domestic.Contains(l.Origin) && Domestic.Contains(l.Destination));
-            Console.WriteLine($"{legs.Count} isDomestic={isDomestic}");
             var from = 0;
             var prev = 0;
             var last = 1;
@@ -46,7 +36,6 @@ namespace Flight.Services
             while (last < legs.Count)
             {
                 var span = legs[last].Departure - legs[prev].Arrival;
-                Console.WriteLine($"{last} {legs[last].Destination} {span.TotalMinutes}");
                 if (span.TotalMinutes > GetMaxLayoverMinutes(isDomestic)) 
                 {
                     segment = new Leg(legs[from].Origin, legs[prev].Destination, legs[from].Departure, legs[prev].Arrival);
@@ -61,9 +50,8 @@ namespace Flight.Services
             return segments;
         }
 
-        private double GetMaxLayoverMinutes(bool isDomestic) => isDomestic ? 4 * 60 : 24 * 60;
+        private static double GetMaxLayoverMinutes(bool isDomestic) => isDomestic ? 4 * 60 : 24 * 60;
 
-        private DateTimeOffset ParseTime(string time) => DateTimeOffset.Parse(time);
-            //DateTimeOffset.ParseExact(time, TimePattern, CultureInfo.InvariantCulture);
+        private static DateTimeOffset ParseTime(string time) => DateTimeOffset.Parse(time);
     }
 }

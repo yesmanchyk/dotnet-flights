@@ -6,14 +6,6 @@ public class FlightServiceTest
     private readonly FlightService _flightService = new FlightService();
 
     [Fact]
-    public void IsSegment_WhenInputIsEmpty_ReturnsFalse()
-    {
-        var result = _flightService.IsSegment(0);
-
-        Assert.False(result, "Empty is not a segment");
-    }
-
-    [Fact]
     public void ReadFile_WhenPathIsValid_ReturnsLegs()
     {
         var path = GetDomesticFlightPath();
